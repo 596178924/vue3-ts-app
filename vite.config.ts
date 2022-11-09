@@ -13,6 +13,13 @@ export default defineConfig({
 		outDir: 'dist', // 指定输出路径
 		cssCodeSplit: true, // 启用 CSS 代码拆分
 		sourcemap: false, // 构建后是否生成 source map 文件
+		terserOptions: {
+			compress: {
+				//生产环境时移除console.log()
+				drop_console: true,
+				drop_debugger: true,
+			},
+		},
 	},
 	server: {
 		open: false,
