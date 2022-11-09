@@ -1,0 +1,36 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+// @import "tailwindcss/screens"
+// @screen
+// 指令允许您创建通过名称引用断点的媒体查询
+// @layer 归类
+// @responsive 产生断点
+// @variants focus, hover 产生变体
+
+@layer base {
+    h1 {
+        @apply text-2xl;
+    }
+
+    h2 {
+        @apply text-xl;
+    }
+
+    h3 {
+        @apply text-lg;
+    }
+
+    h4 {
+        @apply text-base;
+    }
+
+    h5 {
+        @apply text-md;
+    }
+
+    h6 {
+        @apply text-sm;
+    }
+}
