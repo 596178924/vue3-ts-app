@@ -3,34 +3,44 @@
 </template>
 
 <script setup lang="ts">
-import { State } from "./typeHelper";
 import { defineProps, defineEmits, withDefaults, reactive, onMounted, computed, watch, Ref, nextTick } from "vue-demi";
+defineOptions({
+	name: "AutoCounter",
+});
 const emits = defineEmits(["finished"]);
-const props = withDefaults(
-	defineProps<{
-		startAmount?: number;
-		endAmount: number;
-		duration?: number;
-		autoinit?: boolean;
-		prefix?: string;
-		suffix?: string;
-		separator?: string;
-		decimalSeparator?: string;
-		decimals?: number;
-	}>(),
-	{
-		startAmount: 0,
-		endAmount: 0,
-		duration: 1,
-		autoinit: true,
-		prefix: "",
-		suffix: "",
-		separator: ",",
-		decimalSeparator: ".",
-		decimals: 1,
-	}
-);
-const state: State = reactive({
+interface AutoCounterProps {
+	startAmount?: number; //初始值
+	endAmount: number; //结束值
+	duration?: number; //持续时间
+	autoinit?: boolean; //载入后自动
+	prefix?: string; //前缀
+	suffix?: string; //后缀
+	separator?: string; //分割
+	decimalSeparator?: string; //小数点
+	decimals?: number; //小数后几位
+}
+const props = withDefaults(defineProps<AutoCounterProps>(), {
+	startAmount: 0,
+	endAmount: 0,
+	duration: 3,
+	autoinit: true,
+	prefix: "",
+	suffix: "",
+	separator: ",",
+	decimalSeparator: ".",
+	decimals: 0,
+});
+interface State {
+	timestamp: number;
+	startTimestamp: number|null|undefined;
+	currentStartAmount: number;
+	currentAmount: number;
+	currentDuration: number;
+	paused: boolean;
+	remaining: number;
+	animationFrame: number;
+}
+const state = reactive<State>({
 	timestamp: 0,
 	startTimestamp: 0,
 	currentAmount: 0,
@@ -46,7 +56,7 @@ watch(
 	(): void => reset()
 );
 onMounted((): void => {
-	nextTick(():void => {
+	nextTick((): void => {
 		state.currentAmount = props.startAmount;
 		state.currentStartAmount = props.startAmount;
 		state.currentDuration = durationTime.value * 1000;
@@ -62,11 +72,11 @@ const durationTime = computed((): number => {
 });
 const formatedAmount = computed((): string => {
 	const regex = /(\d+)(\d{3})/;
-	let numberString: string = state.currentAmount.toFixed(props.decimals).toString();
-	let numberArray: Array<string> = numberString.split(".");
+	const numberString: string = state.currentAmount.toFixed(props.decimals).toString();
+	const numberArray: Array<string> = numberString.split(".");
 	let numbers: string = numberArray[0];
-	let decimals: string = numberArray.length > 1 ? props.decimalSeparator + numberArray[1] : "";
-	let isNumber = !isNaN(parseFloat(props.separator));
+	const decimals: string = numberArray.length > 1 ? props.decimalSeparator + numberArray[1] : "";
+	const isNumber = !isNaN(parseFloat(props.separator));
 	if (props.separator && !isNumber) {
 		while (regex.test(numbers)) numbers = numbers.replace(regex, "$1" + props.separator + "$2");
 	}
@@ -104,30 +114,17 @@ function resume(): void {
 }
 function counting(_timestamp: number): void {
 	const timestamp: number = _timestamp ? _timestamp : 0;
-	console.log(timestamp);
-
 	if (!state.startTimestamp) state.startTimestamp = timestamp;
-	let progress: number = timestamp - state.startTimestamp;
+	const progress: number = timestamp - state.startTimestamp;
 	state.remaining = state.currentDuration - progress;
-	console.log(progress);
-
+	const divProgress = progress / state.currentDuration;
 	if (!isCountingUp.value) {
-		const c: number =
-			state.currentStartAmount -
-			(state.currentStartAmount - props.endAmount) * (progress / state.currentDuration);
-		console.log(c);
-
+		const c: number = state.currentStartAmount - (state.currentStartAmount - props.endAmount) * divProgress;
 		state.currentAmount = c < props.endAmount ? props.endAmount : c;
 	} else {
-		const c: number =
-			state.currentStartAmount +
-			(props.endAmount - state.currentStartAmount) * (progress / state.currentDuration);
-		console.log(c, progress, state.currentDuration);
-
+		const c: number = state.currentStartAmount + (props.endAmount - state.currentStartAmount) * divProgress;
 		state.currentAmount = c > props.endAmount ? props.endAmount : c;
 	}
-	console.log(state.currentAmount);
-
 	if (progress < state.currentDuration) state.animationFrame = window.requestAnimationFrame(counting);
 	else emits("finished");
 }

@@ -1,20 +1,20 @@
 <template>
-	<div>
+	<div class='view'>
+		<!-- <Transition appear name="fade" >
+			<span v-show="show">home</span>
+		</Transition> -->
 		home
-		<auto-counter :startAmount="0" :endAmount="20" />
+		<a-button  type="primary">按钮</a-button>
 	</div>
 </template>
 
-<script lang="ts">
-import AutoCounter from "@/components/AutoCounter/index.vue";
-import { defineComponent } from "vue-demi";
-export default defineComponent({
-	name: 'home',
-	components:{
-		AutoCounter
-	},
-})
+<script setup lang='ts'>
+// import { ref } from 'vue-demi';
+// const show = ref(true)
 </script>
 
-<style lang="less" scoped>
+<style lang='less' scoped>
+.view {
+
+}
 </style>

@@ -42,9 +42,10 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.d.ts",
+    "node_modules/**/*.d.ts",
     "src/**/*.tsx",
     "src/**/*.vue"
-  ],
+, "src/config/settings.json"  ],
   "references": [
     {
       "path": "./tsconfig.node.json"
